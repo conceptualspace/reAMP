@@ -13,13 +13,13 @@ reamp is an offline-first, album-centric music player for sound nerds
 - remote control -- seek / volume control via mobile; later allow queuing and adding youtube URLs ('party mode')
 - displays album art from folder, track, or discogs
 - streaming support - youtube, soundcloud, shoutcast
-- voice control
-- universal kb shortcuts
-
-#### audio extras:
 - DJ controls - loop, tempo, multi-track
 - gain control with boost (reAMP goes to 11!)
 - fuzzer / tube emulator
 - compressor
 - gapless playback / crossfading
-- auto dj (eventually)
+- universal kb shortcuts
+
+#### wishlist:
+- voice control
+- auto DJ (select next track based on genre > bpm > key; align beats; sync tempo; x-fade @ -8 bar)
