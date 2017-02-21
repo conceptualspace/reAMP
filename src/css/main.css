@@ -1,0 +1,101 @@
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: small;
+    overflow: hidden;
+    background-color: black;
+    color: lightgray;
+}
+
+/* overrides */
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 6px;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, .4);
+    -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}
+a, button, input[disabled], label {
+    cursor: default !important;
+    -webkit-user-select: none !important;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    background-color: dimgray;
+    height:2px;
+}
+
+::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    background-color: lightgray;
+    width: 5px;
+    height: 1em;
+}
+
+button {
+    background-color: rgba(0,0,0,0);
+    color: lightgray;
+    border: 1px solid black;
+    border-radius: 4px;
+}
+
+button:hover {
+    color: deepskyblue;
+}
+
+.active {
+    color: deepskyblue;
+}
+
+input:focus, button:focus {
+    outline:none;
+}
+
+/* stylez */
+#container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#canvas {
+    flex: 10;
+    -webkit-app-region: drag;
+    padding: 5px;
+}
+
+#status {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 10px;
+}
+
+#controls {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+
+}
+
+#close {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    color: dimgray;
+    -webkit-app-region: no-drag;
+}
+
+#close:hover{
+    color: deepskyblue;
+}
+
+#duration {
+    font-family:Courier;
+    padding: 0px 10px;
+}

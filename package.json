@@ -1,0 +1,22 @@
+{
+  "name": "reAMP",
+  "version": "0.1.0",
+  "author": "tyler milford <dev@conceptualspace.net>",
+  "description": "cross-platform music player",
+  "license": "MPL-2.0",
+  "main": "src/main.js",
+  "dependencies": {
+    "glob": "^7.1.1",
+    "async": "^2.1.5",
+    "musicmetadata": "^2.0.4",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "electron": "^1.6.0",
+    "electron-builder": "^13.11.1"
+  },
+  "scripts": {
+    "pack": "build --dir",
+    "dist": "build"
+  }
+}
