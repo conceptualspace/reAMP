@@ -7,7 +7,7 @@ as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 // supported formats (ideally)
 // MP3, AIFF, WAV, MPEG-4, AAC, M4A, OGG, FLAC
 
-const {app, dialog} = require('electron').remote;
+const {remote} = require('electron');
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
@@ -36,7 +36,7 @@ dbSettings.info(function (err, info) {
         // new setup
         var config = {
             "_id": "config",
-            "libraryPath": app.getPath('home'),
+            "libraryPath": remote.app.getPath('home'),
             "volume": 0.5,
             "nowPlaying": 0
         };
@@ -64,23 +64,25 @@ dbSettings.info(function (err, info) {
 
 // directory chooser
 function setLibraryPath() {
-    dialog.showOpenDialog({title:'Add Music Library', defaultPath:app.getPath('home'), properties:["openDirectory"]}, function(filePath) {
-        dbSettings.get("config", function (err, doc) {
-            if (err) {
-                alert(err);
-                return
-            }
-            doc.libraryPath = filePath;
-            console.log(filePath);
-            dbSettings.put(doc, function (err, response) {
+    remote.dialog.showOpenDialog({title:'Add Music Library', defaultPath:remote.app.getPath('home'), properties:["openDirectory"]}, function(filePath) {
+        if(filePath) {
+            dbSettings.get("config", function (err, doc) {
                 if (err) {
                     alert(err);
-                    return;
+                    return
                 }
-                console.log("updated library path: " + response);
-                scanLibrary();
+                doc.libraryPath = filePath;
+                console.log(filePath);
+                dbSettings.put(doc, function (err, response) {
+                    if (err) {
+                        alert(err);
+                        return;
+                    }
+                    console.log("updated library path: " + response);
+                    scanLibrary();
+                });
             });
-        });
+        }
     });
 }
 
@@ -148,7 +150,11 @@ function updateLibrary(tracks) {
 }
 
 // slowly restore volume
-gainNode.gain.linearRampToValueAtTime(VOL, audioCtx.currentTime + 2);
+//gainNode.gain.linearRampToValueAtTime(VOL, audioCtx.currentTime + 2);
+
+window.onbeforeunload = function(e) {
+    saveVol(document.getElementById('vol').value);
+};
 
 // todo: display vol in dBFS (and set a stop at 1 on the input slider)
 //let dbfs = 20 * Math.log10(gain);
@@ -156,16 +162,16 @@ gainNode.gain.linearRampToValueAtTime(VOL, audioCtx.currentTime + 2);
 // logarithmic volume
 // todo make this a hybrid
 function scaleVolume(position) {
-    if(position <= 1) {
+    if(position <= 10) {
         return 0;
     }
     // input position between 1 and 1000
     var minp = 1;
     var maxp = 1000;
 
-    // output should be between 0.001 and 1.1
+    // output should be between 0.001 and 1
     var minv = Math.log(0.001);
-    var maxv = Math.log(1.1);
+    var maxv = Math.log(1);
 
     // calculate adjustment factor
     var scale = (maxv-minv) / (maxp-minp);
@@ -176,8 +182,6 @@ function scaleVolume(position) {
 function setVol(val) {
     //audio.volume = val;
     gainNode.gain.value = scaleVolume(val);
-    _.debounce(saveVol(val), 1000);
-    //todo: wtf
 }
 
 function saveVol(vol) {
@@ -198,6 +202,13 @@ function saveVol(vol) {
             });
         }
     });
+}
+
+function setBalance(val) {
+    if(val < 600 && val > 400) {
+        document.getElementById('balance').value = 500;
+    }
+    // todo: apply balance
 }
 
 let audio = document.getElementById('currentTrack');
