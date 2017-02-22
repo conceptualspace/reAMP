@@ -4,9 +4,9 @@ reamp is an offline-first, album-centric music player for sound nerds
 
 ### features
 
-- winamp-esque library / playlist (queue) separation
+- winamp-esque library / playlist / queue separation
 - album and directory structure views
-- smart shuffle algorithm -- no repeat until playlist exhausted; randomized between artists so artists with many songs do not monopolize the playlist
+- smart shuffle algorithm -- no repeats until playlist exhausted; randomized between artists so artists with many songs do not monopolize the playlist
 - studio quality equalizer -- graphic (constant-Q, ISO 32 band) and 4-band DJ  (allen & heath frequency model)
 - studio quality audio analysis / visualizations (VU meter, oscilloscope, spectrum analyzer, full track waveform, displays for bitrate, samplerate)
 - logarithmic volume control
