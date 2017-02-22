@@ -29,19 +29,11 @@ function createWindow () {
         slashes: true
     }));
 
+    win.focus();
+
     // Emitted when the window is closed.
     win.on('closed', () => {
         win = null
-    })
-
-    win.on('close', (event) => {
-        event.preventDefault();
-        win.hide()
-    })
-
-    win.on('minimize', (event) => {
-        event.preventDefault();
-        win.hide()
     })
 
     tray = new Tray('build/icon.png');
@@ -73,8 +65,11 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
     if (win === null) {
-        createWindow()
+        createWindow();
+        return
     }
+    win.show();
+    win.focus();
 })
 
 // In this file you can include the rest of your app's specific main process
