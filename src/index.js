@@ -55,7 +55,8 @@ dbSettings.info(function (err, info) {
             } else {
                 // TODO: update ui
                 //setVol(doc.volume)
-                document.getElementById('vol').value = doc.volume
+                document.getElementById('vol').value = doc.volume;
+                gainNode.gain.value = scaleVolume(doc.volume);
             }
         });
     }
@@ -311,7 +312,11 @@ function playRandom() {
                         console.error(err);
                         return;
                     }
-                    status.nowPlaying = doc.artist + " - " + doc.title + " (" + doc.album + ")";
+                    if (doc.artist == '') {
+                        status.nowPlaying = path.basename(doc._id)
+                    } else {
+                        status.nowPlaying = doc.artist + " - " + doc.title + " (" + doc.album + ")";
+                    }
                 });
                 audio.play();
                 // add track to history db
