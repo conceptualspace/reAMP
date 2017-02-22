@@ -34,7 +34,7 @@ input[type=range] {
     -webkit-appearance: none;
     background-color: lightgray;
     width: 5px;
-    height: 1em;
+    height: 2em;
 }
 
 button {
@@ -50,6 +50,14 @@ button:hover {
 
 .active {
     color: deepskyblue;
+}
+
+.paused {
+    animation: pulse 1.2s linear infinite;
+}
+
+@keyframes pulse {
+    50% { opacity: 0.3; }
 }
 
 input:focus, button:focus {

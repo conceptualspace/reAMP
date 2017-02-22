@@ -211,6 +211,19 @@ function setBalance(val) {
     // todo: apply balance
 }
 
+function playPause() {
+    if(status.isActive) {
+        audio.pause()
+        status.isPaused = true;
+        status.isActive = false;
+    }
+    else if(audio.src) {
+        audio.play();
+        status.isPaused = false;
+        status.isActive = true;
+    }
+}
+
 let audio = document.getElementById('currentTrack');
 let song= '';
 let status = {
@@ -219,16 +232,17 @@ let status = {
     currentTime: '',
     remainingTime: '',
     bitRate: '',
-    seen: true
+    seen: true,
+    isActive: false,
+    isPaused: false
 };
 
-let playing = {
-    isActive: false
-};
 
 audio.onended = function() {
+    status.isActive = false;
     playRandom()
 };
+
 
 function prettyTime(s) {
     let minutes = Math.floor(s / 60);
@@ -249,7 +263,7 @@ function getBitRate() {
         var kbits = bits / 1000;
         var s = audio.duration;
         var bitrate = kbits/s;
-        status.bitRate = Math.floor(bitrate)
+        status.bitRate = Math.floor(bitrate) + 'kbps'
     });
 }
 
@@ -267,6 +281,10 @@ audio.onloadedmetadata = function() {
 audio.ontimeupdate = function() {
     status.currentTime = prettyTime(audio.currentTime);
     status.remainingTime = remainingTime(audio.currentTime, audio.duration)
+};
+
+audio.onplay = function(){
+    status.isActive = true
 };
 
 function playRandom() {
@@ -287,7 +305,7 @@ function playRandom() {
         dbHistory.get(randomSong, function(err, doc) {
             if (err) {
                 audio.src = randomSong;
-                playing.isActive = true;
+                //status.isActive = true;
                 dbLibrary.get(randomSong, function(err, doc) {
                     if(err) {
                         console.error(err);
@@ -333,7 +351,7 @@ var vmDuration = new Vue({
 
 var playButton = new Vue({
     el: '#playBtn',
-    data: playing
+    data: status
 });
 
 // web audio stuff (we can still play/pause thru the media element, and have its output routed into the processing
