@@ -4,13 +4,14 @@
  as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
  */
 
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, Menu, Tray} = require('electron');
 const path = require('path');
 const url = require('url');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
+let tray;
 
 function createWindow () {
     // Create the browser window.
@@ -32,6 +33,29 @@ function createWindow () {
     win.on('closed', () => {
         win = null
     })
+
+    win.on('close', (event) => {
+        event.preventDefault();
+        win.hide()
+    })
+
+    win.on('minimize', (event) => {
+        event.preventDefault();
+        win.hide()
+    })
+
+    tray = new Tray('build/icon.png');
+    const contextMenu = Menu.buildFromTemplate([
+        {label: 'reAMP...'},
+        {type: 'separator'},
+        {label: 'Quit', click: function() { app.quit(); win.destroy(); }}
+    ]);
+    tray.setToolTip('reAMP');
+    tray.setContextMenu(contextMenu);
+
+    tray.on('click', function() {
+        win.show();
+    });
 
     // Open DevTools.
     win.webContents.openDevTools();
