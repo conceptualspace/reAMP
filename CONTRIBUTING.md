@@ -34,6 +34,6 @@ git push
 git push --tags
 git branch -d release-vX.X.X
 git checkout develop
-git merge --no-ff develop
+git merge --no-ff master
 git push
 ```
