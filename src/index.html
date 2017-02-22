@@ -31,13 +31,13 @@ as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 				<button id ="playBtn" onclick="playPause();" title="Play/Pause" v-bind:class="{ active: isActive }"><i class="fa fa-lg fa-play"></i></button>
 				<button id ="playBtn" onclick="playRandom();" title="Play Random" v-bind:class="{ active: isActive }"><i class="fa fa-lg fa-random"></i></button>
 
-				<input type="range" min="0" max="1.1" value="0.5" id="vol" step="0.01" oninput="setVol(value)">
+				<input type="range" min="0" max="1000" id="vol" step="1" oninput="setVol(value)">
 				&nbsp;<i class="fa fa-volume-up"></i>
 			</div>
 		</div>
 
 		<audio id="currentTrack"></audio>
-		<button id="close" title="Close" onclick="window.close();"><i class="fa fa-close"></i></button>
+		<button id="close" title="Close" onclick="window.minimize();"><i class="fa fa-close"></i></button>
 
 	</body>
 

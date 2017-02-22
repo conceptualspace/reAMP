@@ -147,9 +147,29 @@ function updateLibrary(tracks) {
     });
 }
 
+// logarithmic volume
+// todo make this a hybrid
+function scaleVolume(position) {
+    if(position <= 1) {
+        return 0;
+    }
+    // input position between 1 and 1000
+    var minp = 1;
+    var maxp = 1000;
+
+    // output should be between 0.001 and 1.1
+    var minv = Math.log(0.001);
+    var maxv = Math.log(1.1);
+
+    // calculate adjustment factor
+    var scale = (maxv-minv) / (maxp-minp);
+
+    return Math.exp(minv + scale*(position-minp));
+}
+
 function setVol(val) {
     //audio.volume = val;
-    gainNode.gain.value = val;
+    gainNode.gain.value = scaleVolume(val);
     _.debounce(saveVol(val), 1000);
     //todo: wtf
 }
