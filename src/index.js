@@ -150,7 +150,7 @@ function updateLibrary(tracks) {
 // slowly restore volume
 gainNode.gain.linearRampToValueAtTime(VOL, audioCtx.currentTime + 2);
 
-// display vol in dBFS
+// todo: display vol in dBFS (and set a stop at 1 on the input slider)
 //let dbfs = 20 * Math.log10(gain);
 
 // logarithmic volume
