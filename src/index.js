@@ -7,7 +7,7 @@ as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 // supported formats (ideally)
 // MP3, AIFF, WAV, MPEG-4, AAC, M4A, OGG, FLAC
 
-const {app, dialog} = require('electron').remote;
+const {remote} = require('electron');
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
@@ -36,7 +36,7 @@ dbSettings.info(function (err, info) {
         // new setup
         var config = {
             "_id": "config",
-            "libraryPath": app.getPath('home'),
+            "libraryPath": remote.app.getPath('home'),
             "volume": 0.5,
             "nowPlaying": 0
         };
@@ -55,7 +55,8 @@ dbSettings.info(function (err, info) {
             } else {
                 // TODO: update ui
                 //setVol(doc.volume)
-                document.getElementById('vol').value = doc.volume
+                document.getElementById('vol').value = doc.volume;
+                gainNode.gain.value = scaleVolume(doc.volume);
             }
         });
     }
@@ -64,23 +65,25 @@ dbSettings.info(function (err, info) {
 
 // directory chooser
 function setLibraryPath() {
-    dialog.showOpenDialog({title:'Add Music Library', defaultPath:app.getPath('home'), properties:["openDirectory"]}, function(filePath) {
-        dbSettings.get("config", function (err, doc) {
-            if (err) {
-                alert(err);
-                return
-            }
-            doc.libraryPath = filePath;
-            console.log(filePath);
-            dbSettings.put(doc, function (err, response) {
+    remote.dialog.showOpenDialog({title:'Add Music Library', defaultPath:remote.app.getPath('home'), properties:["openDirectory"]}, function(filePath) {
+        if(filePath) {
+            dbSettings.get("config", function (err, doc) {
                 if (err) {
                     alert(err);
-                    return;
+                    return
                 }
-                console.log("updated library path: " + response);
-                scanLibrary();
+                doc.libraryPath = filePath;
+                console.log(filePath);
+                dbSettings.put(doc, function (err, response) {
+                    if (err) {
+                        alert(err);
+                        return;
+                    }
+                    console.log("updated library path: " + response);
+                    scanLibrary();
+                });
             });
-        });
+        }
     });
 }
 
@@ -147,11 +150,39 @@ function updateLibrary(tracks) {
     });
 }
 
+// slowly restore volume
+//gainNode.gain.linearRampToValueAtTime(VOL, audioCtx.currentTime + 2);
+
+window.onbeforeunload = function(e) {
+    saveVol(document.getElementById('vol').value);
+};
+
+// todo: display vol in dBFS (and set a stop at 1 on the input slider)
+//let dbfs = 20 * Math.log10(gain);
+
+// logarithmic volume
+// todo make this a hybrid
+function scaleVolume(position) {
+    if(position <= 10) {
+        return 0;
+    }
+    // input position between 1 and 1000
+    var minp = 1;
+    var maxp = 1000;
+
+    // output should be between 0.001 and 1
+    var minv = Math.log(0.001);
+    var maxv = Math.log(1);
+
+    // calculate adjustment factor
+    var scale = (maxv-minv) / (maxp-minp);
+
+    return Math.exp(minv + scale*(position-minp));
+}
+
 function setVol(val) {
     //audio.volume = val;
-    gainNode.gain.value = val;
-    _.debounce(saveVol(val), 1000);
-    //todo: wtf
+    gainNode.gain.value = scaleVolume(val);
 }
 
 function saveVol(vol) {
@@ -174,6 +205,26 @@ function saveVol(vol) {
     });
 }
 
+function setBalance(val) {
+    if(val < 600 && val > 400) {
+        document.getElementById('balance').value = 500;
+    }
+    // todo: apply balance
+}
+
+function playPause() {
+    if(status.isActive) {
+        audio.pause()
+        status.isPaused = true;
+        status.isActive = false;
+    }
+    else if(audio.src) {
+        audio.play();
+        status.isPaused = false;
+        status.isActive = true;
+    }
+}
+
 let audio = document.getElementById('currentTrack');
 let song= '';
 let status = {
@@ -182,16 +233,17 @@ let status = {
     currentTime: '',
     remainingTime: '',
     bitRate: '',
-    seen: true
+    seen: true,
+    isActive: false,
+    isPaused: false
 };
 
-let playing = {
-    isActive: false
-};
 
 audio.onended = function() {
+    status.isActive = false;
     playRandom()
 };
+
 
 function prettyTime(s) {
     let minutes = Math.floor(s / 60);
@@ -212,7 +264,7 @@ function getBitRate() {
         var kbits = bits / 1000;
         var s = audio.duration;
         var bitrate = kbits/s;
-        status.bitRate = Math.floor(bitrate)
+        status.bitRate = Math.floor(bitrate) + 'kbps'
     });
 }
 
@@ -230,6 +282,10 @@ audio.onloadedmetadata = function() {
 audio.ontimeupdate = function() {
     status.currentTime = prettyTime(audio.currentTime);
     status.remainingTime = remainingTime(audio.currentTime, audio.duration)
+};
+
+audio.onplay = function(){
+    status.isActive = true
 };
 
 function playRandom() {
@@ -250,13 +306,17 @@ function playRandom() {
         dbHistory.get(randomSong, function(err, doc) {
             if (err) {
                 audio.src = randomSong;
-                playing.isActive = true;
+                //status.isActive = true;
                 dbLibrary.get(randomSong, function(err, doc) {
                     if(err) {
                         console.error(err);
                         return;
                     }
-                    status.nowPlaying = doc.artist + " - " + doc.title + " (" + doc.album + ")";
+                    if (doc.artist == '') {
+                        status.nowPlaying = path.basename(doc._id)
+                    } else {
+                        status.nowPlaying = doc.artist + " - " + doc.title + " (" + doc.album + ")";
+                    }
                 });
                 audio.play();
                 // add track to history db
@@ -296,7 +356,7 @@ var vmDuration = new Vue({
 
 var playButton = new Vue({
     el: '#playBtn',
-    data: playing
+    data: status
 });
 
 // web audio stuff (we can still play/pause thru the media element, and have its output routed into the processing
