@@ -147,6 +147,12 @@ function updateLibrary(tracks) {
     });
 }
 
+// slowly restore volume
+gainNode.gain.linearRampToValueAtTime(VOL, audioCtx.currentTime + 2);
+
+// display vol in dBFS
+//let dbfs = 20 * Math.log10(gain);
+
 // logarithmic volume
 // todo make this a hybrid
 function scaleVolume(position) {
