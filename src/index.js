@@ -236,7 +236,7 @@ function prettyTime(s) {
 }
 
 function getBitRate() {
-    var track = decodeURIComponent((audio.src).slice(7));
+    var track = decodeURIComponent((audio.src).slice(8));
     fs.stat(track, function(err, stats) {
         if(err) {
             console.log(err);
