@@ -4,27 +4,19 @@ This source code is subject to the terms of the Mozilla Public License, v. 2.0
 as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 */
 
-// supported formats (ideally)
-// MP3, AIFF, WAV, MPEG-4, AAC, M4A, OGG, FLAC
-
 const {remote} = require('electron');
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
 const async = require('async');
 const mm = require('musicmetadata');
-var _ = require('underscore');
+const _ = require('underscore');
 
 // setup DB
 const dbSettings = new PouchDB('settings', {auto_compaction: true});
 const dbLibrary = new PouchDB('library', {auto_compaction: true});
 const dbHistory = new PouchDB('history', {auto_compaction: true});
 
-// windoze paths (actually electron seems to handle these OK... todo delete me?)
-function cleanPath(path) {
-    var regex = /\//g;
-    return dir.replace(regex, "\\\\");
-}
 
 // load default settings
 dbSettings.info(function (err, info) {
@@ -53,8 +45,6 @@ dbSettings.info(function (err, info) {
             if (err) {
                 console.error(err);
             } else {
-                // TODO: update ui
-                //setVol(doc.volume)
                 document.getElementById('vol').value = doc.volume;
                 gainNode.gain.value = scaleVolume(doc.volume);
             }
@@ -131,11 +121,10 @@ function readMetaData(tracks) {
             cb()
         })
     }, function(err) {
-        // done fetching metadata
         if(err) {
             console.error(err);
         }
-        // update library database
+        // done fetching metadata; update library database
         updateLibrary(pendingTracks);
     })
 }
@@ -161,7 +150,6 @@ window.onbeforeunload = function(e) {
 //let dbfs = 20 * Math.log10(gain);
 
 // logarithmic volume
-// todo make this a hybrid
 function scaleVolume(position) {
     if(position <= 10) {
         return 0;
@@ -186,20 +174,16 @@ function setVol(val) {
 }
 
 function saveVol(vol) {
-    console.log("saving vol");
     dbSettings.get('config', function (err, doc) {
         if (err) {
             console.error(err);
         } else {
-            console.log(doc);
             doc.volume = vol;
-            console.log(doc);
             dbSettings.put(doc, function(err, response) {
                 if (err) {
                     console.error(err);
-                    return;
                 }
-                console.log("settings updated")
+                // settings saved
             });
         }
     });
@@ -214,7 +198,7 @@ function setBalance(val) {
 
 function playPause() {
     if(status.isActive) {
-        audio.pause()
+        audio.pause();
         status.isPaused = true;
         status.isActive = false;
     }
@@ -226,7 +210,7 @@ function playPause() {
 }
 
 let audio = document.getElementById('currentTrack');
-let song= '';
+
 let status = {
     nowPlaying: '',
     duration: '',
@@ -269,7 +253,7 @@ function getBitRate() {
 }
 
 function remainingTime(elapsed, total) {
-    s = total - elapsed
+    var s = total - elapsed
     return "-" + prettyTime(s)
 }
 
@@ -337,13 +321,6 @@ function updateHistory(track) {
 }
 
 
-// html media element
-//let song = '/Users/tyler/Music/test.mp3';
-//var song = 'D:\\Music\\!MISC\\02 - bait for dub.mp3';
-
-//let audio = new Audio(song);
-//audio.play();
-
 var appStatus = new Vue({
     el: '#status',
     data: status
@@ -351,11 +328,6 @@ var appStatus = new Vue({
 
 var vmDuration = new Vue({
     el: '#duration',
-    data: status
-})
-
-var playButton = new Vue({
-    el: '#playBtn',
     data: status
 });
 
@@ -409,12 +381,12 @@ function draw() {
 draw();
 
 
-
 // wire them together
 source.connect(analyser);
 analyser.connect(gainNode);
 
 // audio output
+// todo: toggle analysis pre/post effects nodes
 //gainNode.connect(audioCtx.destination);
 //gainNode.connect(analyser);
 gainNode.connect(audioCtx.destination);

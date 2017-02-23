@@ -19,6 +19,7 @@ reamp is an offline-first, album-centric music player for sound nerds
 - compressor
 - gapless playback / crossfading
 - universal kb shortcuts
+- support MP3, AIFF, WAV, MPEG-4, AAC, M4A, OGG, FLAC playback
 
 #### wishlist:
 - voice control
