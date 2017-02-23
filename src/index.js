@@ -331,6 +331,11 @@ var vmDuration = new Vue({
     data: status
 });
 
+var playButton = new Vue({
+    el: '#playBtn',
+    data: status
+});
+
 // web audio stuff (we can still play/pause thru the media element, and have its output routed into the processing
 // graph of the audio context!
 
