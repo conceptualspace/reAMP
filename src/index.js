@@ -235,8 +235,16 @@ function prettyTime(s) {
     return minutes + ":" + seconds;
 }
 
+function trimFilePrefix(path) {
+    // returns path str without the "file://" prefix
+    if (process.platform == 'darwin') {
+        return decodeURIComponent((audio.src).slice(7));
+    }
+    return decodeURIComponent((audio.src).slice(8));
+}
+
 function getBitRate() {
-    var track = decodeURIComponent((audio.src).slice(8));
+    var track = trimFilePrefix(audio.src);
     fs.stat(track, function(err, stats) {
         if(err) {
             console.log(err);
