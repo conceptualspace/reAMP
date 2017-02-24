@@ -2,6 +2,8 @@
 
 reamp is an offline-first, album-centric music player for sound nerds
 
+![alt tag](https://github.com/conceptualspace/reAMP/raw/develop/assets/reaMP-screenshot.png)
+
 ### features
 
 - winamp-esque library / playlist / queue separation
