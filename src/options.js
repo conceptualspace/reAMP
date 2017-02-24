@@ -20,6 +20,7 @@ var vmDevices = new Vue({
             // todo, get audio element from the main window? or set to DB and have DB listen?
             // mediaElement = ...
             //element.setSinkId(device.id).then(function() {console.log('woo!');}).catch(function(err) {console.error(err);});
+            ipcRenderer.send('newDevice', device.id)
             remote.getCurrentWindow().hide();
         }
     }
@@ -32,9 +33,23 @@ function gotDevices(deviceInfos) {
             let device = {}
             device.id = deviceInfo.deviceId
             device.label = deviceInfo.label
+            device.isSelected = false
             devices.push(device)
         }
     }
 }
 
 navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(function(err) {console.error(err);});
+
+ipcRenderer.on('settings', (event, arg) => {
+    // clear selection
+    for(device of devices) {
+        device.isSelected = false
+    }
+
+    // apply selection
+    devices[devices.findIndex(function(device) {
+        return device.id == arg
+    })].isSelected = true
+    console.log(devices)
+});

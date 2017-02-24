@@ -19,6 +19,23 @@ const dbHistory = new PouchDB('history', {auto_compaction: true});
 
 let audio = document.getElementById('currentTrack');
 
+ipcRenderer.on('newDevice', (event, arg) => {
+    audio.setSinkId(arg).then(function(){}).catch(function(err) {console.error(err);});
+    dbSettings.get('config', function (err, doc) {
+        if (err) {
+            console.error(err);
+        } else {
+            doc.outputDevice = arg;
+            dbSettings.put(doc, function(err, response) {
+                if (err) {
+                    console.error(err);
+                }
+                ipcRenderer.send('settings', doc.outputDevice)
+            });
+        }
+    });
+});
+
 
 // load default settings
 dbSettings.info(function (err, info) {
@@ -51,6 +68,7 @@ dbSettings.info(function (err, info) {
                 document.getElementById('vol').value = doc.volume;
                 gainNode.gain.value = scaleVolume(doc.volume);
                 audio.setSinkId(doc.outputDevice).then(function(){}).catch(function(err) {console.error(err);});
+                ipcRenderer.send('settings', doc.outputDevice)
             }
         });
     }

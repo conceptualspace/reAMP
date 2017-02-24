@@ -77,6 +77,7 @@ function createWindow () {
 
     // Open DevTools.
     win.webContents.openDevTools();
+    optionsWin.webContents.openDevTools();
 
     // listeners
 
@@ -85,6 +86,16 @@ function createWindow () {
             optionsWin.show();
         }
         //event.sender.send('message', 'reply')
+    })
+
+    ipcMain.on('settings', (event, arg) => {
+        //event.sender.send('settings', arg)
+        optionsWin.webContents.send('settings', arg);
+    })
+
+    ipcMain.on('newDevice', (event, arg) => {
+        //event.sender.send('settings', arg)
+        win.webContents.send('newDevice', arg);
     })
 }
 
