@@ -4,7 +4,7 @@ This source code is subject to the terms of the Mozilla Public License, v. 2.0
 as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 */
 
-const {remote} = require('electron');
+const {ipcRenderer, remote} = require('electron');
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
@@ -281,7 +281,6 @@ audio.onplay = function(){
 };
 
 function playRandom() {
-    console.log("playing random track...");
     dbLibrary.allDocs(function(err, result) {
         avoidHistory(result.rows);
     });

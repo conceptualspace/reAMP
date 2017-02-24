@@ -1,0 +1,37 @@
+<!--
+Copyright (c) 2016-2017 Tyler Milford. All rights reserved.
+This source code is subject to the terms of the Mozilla Public License, v. 2.0
+as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
+-->
+
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>reAMP</title>
+		<link rel="stylesheet" href="css/font-awesome.min.css">
+        <link rel="stylesheet" href="css/material-icons.css">
+		<link rel="stylesheet" type="text/css" href="css/main.css">
+		<link rel="stylesheet" type="text/css" href="css/options.css">
+	</head>
+
+	<body>
+		<div id="container">
+			<h4>Audio Output:</h4>
+			<div class="device" v-for="device in devices" v-on:click="attachDevice(device)">
+				{{ device.label }}
+			</div>
+
+		</div>
+
+		<button id="close" title="Close" onclick="remote.getCurrentWindow().hide();"><i class="fa fa-close"></i></button>
+
+	</body>
+
+	<script src="lib/vue.min.js"></script>
+	<script src="lib/pouchdb-6.1.2.min.js"></script>
+	<script src="lib/pouchdb.upsert.min.js"></script>
+	<script src="options.js"></script>
+
+</html>

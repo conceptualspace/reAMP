@@ -4,7 +4,7 @@
  as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
  */
 
-const {app, BrowserWindow, Menu, Tray} = require('electron');
+const {app, BrowserWindow, ipcMain, Menu, Tray} = require('electron');
 const path = require('path');
 const url = require('url');
 
@@ -20,7 +20,8 @@ function createWindow () {
         height: 500,
         useContentSize: true,
         frame: false,
-        transparent: true
+        transparent: true,
+        backgroundColor: '#000000'
     });
 
     // and load the index.html of the app.
@@ -41,6 +42,8 @@ function createWindow () {
     const contextMenu = Menu.buildFromTemplate([
         {label: 'reAMP...'},
         {type: 'separator'},
+        {label: 'Settings...', click: function() {  optionsWin.show(); }},
+        {type: 'separator'},
         {label: 'Quit', click: function() { app.quit(); win.destroy(); }}
     ]);
     tray.setToolTip('reAMP');
@@ -50,8 +53,39 @@ function createWindow () {
         win.show();
     });
 
+    // options window
+    let optionsWin = new BrowserWindow({
+        show: false,
+        frame: false,
+        modal: true,
+        parent: win,
+        transparent: true,
+        resizable: false,
+        width: 460,
+        height: 400,
+        useContentSize: true
+    });
+    optionsWin.loadURL(url.format({
+        pathname: path.join(__dirname, 'options.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+
+    optionsWin.on('closed', () => {
+        optionsWin = null
+    })
+
     // Open DevTools.
     win.webContents.openDevTools();
+
+    // listeners
+
+    ipcMain.on('message', (event, arg) => {
+        if (arg == 'showOptions') {
+            optionsWin.show();
+        }
+        //event.sender.send('message', 'reply')
+    })
 }
 
 

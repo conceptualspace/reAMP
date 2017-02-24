@@ -11,6 +11,7 @@ as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 		<meta charset="utf-8">
 		<title>reAMP</title>
 		<link rel="stylesheet" href="css/font-awesome.min.css">
+        <link rel="stylesheet" href="css/material-icons.css">
 		<link rel="stylesheet" type="text/css" href="css/main.css">
 	</head>
 
@@ -32,6 +33,7 @@ as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 				<button id ="playBtn" onclick="playRandom();" title="Play Random"><i class="fa fa-lg fa-random"></i></button>
 				<button id ="muteBtn" onclick="mute();" title="Mute"><i class="fa fa-lg fa-volume-up"></i></button>
 				<input type="range" min="0" max="1000" id="vol" step="1" oninput="setVol(value)">
+                <button id ="deviceBtn" onclick="ipcRenderer.send('message', 'showOptions')" title="Select Audio Output Device"><i class="material-icons">speaker</i></button>
 			</div>
 		</div>
 
