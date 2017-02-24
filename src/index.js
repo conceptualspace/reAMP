@@ -372,8 +372,7 @@ function draw() {
 
     analyser.getByteFrequencyData(dataArray);
 
-    canvasCtx.fillStyle = 'rgb(0, 0, 0)';
-    canvasCtx.fillRect(0, 0, 600, 600);
+    canvasCtx.clearRect(0, 0, 600, 600);
 
     var barWidth = (600 / bufferLength) *1.6;
     var barHeight;
