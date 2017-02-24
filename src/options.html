@@ -19,7 +19,7 @@ as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 	<body>
 		<div id="container">
 			<h4>Audio Output:</h4>
-			<div class="device" v-for="device in devices" v-on:click="attachDevice(device)">
+			<div class="device" v-bind:class="{}" v-for="device in devices" v-on:click="attachDevice(device)">
 				{{ device.label }}
 			</div>
 

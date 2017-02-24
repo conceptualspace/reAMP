@@ -17,6 +17,8 @@ const dbSettings = new PouchDB('settings', {auto_compaction: true});
 const dbLibrary = new PouchDB('library', {auto_compaction: true});
 const dbHistory = new PouchDB('history', {auto_compaction: true});
 
+let audio = document.getElementById('currentTrack');
+
 
 // load default settings
 dbSettings.info(function (err, info) {
@@ -30,7 +32,8 @@ dbSettings.info(function (err, info) {
             "_id": "config",
             "libraryPath": remote.app.getPath('home'),
             "volume": 0.5,
-            "nowPlaying": 0
+            "nowPlaying": 0,
+            "outputDevice": "default"
         };
         dbSettings.put(config, function(err, response) {
             if (err) {
@@ -47,6 +50,7 @@ dbSettings.info(function (err, info) {
             } else {
                 document.getElementById('vol').value = doc.volume;
                 gainNode.gain.value = scaleVolume(doc.volume);
+                audio.setSinkId(doc.outputDevice).then(function(){}).catch(function(err) {console.error(err);});
             }
         });
     }
@@ -208,8 +212,6 @@ function playPause() {
         status.isActive = true;
     }
 }
-
-let audio = document.getElementById('currentTrack');
 
 let status = {
     nowPlaying: '',
