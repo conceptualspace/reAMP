@@ -16,12 +16,9 @@ var vmDevices = new Vue({
     },
     methods: {
         attachDevice: function (device) {
-            // attach device to media element
-            // todo, get audio element from the main window? or set to DB and have DB listen?
-            // mediaElement = ...
-            //element.setSinkId(device.id).then(function() {console.log('woo!');}).catch(function(err) {console.error(err);});
+            // attach device to media element in main window
             ipcRenderer.send('newDevice', device.id)
-            remote.getCurrentWindow().hide();
+            //remote.getCurrentWindow().hide();
         }
     }
 });
