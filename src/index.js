@@ -49,6 +49,7 @@ dbSettings.info(function (err, info) {
             "_id": "config",
             "libraryPath": remote.app.getPath('home'),
             "volume": 0.5,
+            "balance": 0,
             "nowPlaying": 0,
             "outputDevice": "default"
         };
@@ -195,10 +196,6 @@ function setVol(val) {
     gainNode.gain.value = scaleVolume(val);
 }
 
-function setBalance(val) {
-    //audio.volume = val;
-    panNode.pan.value = val;
-}
 
 function saveVol(vol) {
     dbSettings.get('config', function (err, doc) {
@@ -217,10 +214,7 @@ function saveVol(vol) {
 }
 
 function setBalance(val) {
-    if(val < 600 && val > 400) {
-        document.getElementById('balance').value = 500;
-    }
-    // todo: apply balance
+    panNode.pan.value = val;
 }
 
 function playPause() {
