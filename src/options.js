@@ -44,12 +44,6 @@ navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(function(err) {
 ipcRenderer.on('settings', (event, arg) => {
     // clear selection
     for(device of devices) {
-        device.isSelected = false
+        device.isSelected = device.id == arg;
     }
-
-    // apply selection
-    devices[devices.findIndex(function(device) {
-        return device.id == arg
-    })].isSelected = true
-    console.log(devices)
 });
