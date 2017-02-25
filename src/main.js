@@ -62,7 +62,7 @@ function createWindow () {
         transparent: true,
         resizable: false,
         width: 460,
-        height: 400,
+        height: 500,
         useContentSize: true
     });
     optionsWin.loadURL(url.format({
