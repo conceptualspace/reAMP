@@ -195,6 +195,11 @@ function setVol(val) {
     gainNode.gain.value = scaleVolume(val);
 }
 
+function setBalance(val) {
+    //audio.volume = val;
+    panNode.pan.value = val;
+}
+
 function saveVol(vol) {
     dbSettings.get('config', function (err, doc) {
         if (err) {
@@ -376,6 +381,9 @@ var source = audioCtx.createMediaElementSource(audio);
 // other audio nodes
 var gainNode = audioCtx.createGain();
 
+// stereo panner
+var panNode = audioCtx.createStereoPanner();
+
 var analyser = audioCtx.createAnalyser();
 analyser.fftSize = 2048;
 var bufferLength = analyser.frequencyBinCount;
@@ -415,9 +423,10 @@ draw();
 // wire them together
 source.connect(analyser);
 analyser.connect(gainNode);
+gainNode.connect(panNode);
 
 // audio output
 // todo: toggle analysis pre/post effects nodes
 //gainNode.connect(audioCtx.destination);
 //gainNode.connect(analyser);
-gainNode.connect(audioCtx.destination);
+panNode.connect(audioCtx.destination);

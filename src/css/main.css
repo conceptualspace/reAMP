@@ -88,6 +88,7 @@ input:focus, button:focus {
     padding: 10px;
     display: flex;
     align-items: center;
+    justify-content: space-around;
 
 }
 
