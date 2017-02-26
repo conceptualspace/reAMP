@@ -300,7 +300,7 @@ audio.onloadedmetadata = function() {
 
 audio.ontimeupdate = function() {
     status.currentTime = prettyTime(audio.currentTime);
-    status.remainingTime = "-" + prettyTime(audio.currentTime - audio.duration)
+    status.remainingTime = prettyTime((audio.currentTime - audio.duration))
 };
 
 audio.onplay = function(){
