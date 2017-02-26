@@ -100,18 +100,21 @@ window.onbeforeunload = function(e) {
 
 // library directory chooser
 function setLibraryPath() {
-    remote.dialog.showOpenDialog({title:'Add Music Library', defaultPath:remote.app.getPath('home'), properties:["openDirectory"]}, function(filePath) {
+    remote.dialog.showOpenDialog({
+        title:'Add Music Library',
+        defaultPath:remote.app.getPath('home'),
+        properties:["openDirectory"]
+    },function(filePath) {
         if(filePath) {
             dbSettings.get("config", function (err, doc) {
                 if (err) {
-                    alert(err);
+                    console.error(err);
                     return
                 }
                 doc.libraryPath = filePath;
-                console.log(filePath);
                 dbSettings.put(doc, function (err, response) {
                     if (err) {
-                        alert(err);
+                        console.error(err);
                         return;
                     }
                     console.log("updated library path: " + response);
