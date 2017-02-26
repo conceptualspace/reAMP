@@ -17,27 +17,26 @@ const dbSettings = new PouchDB('settings', {auto_compaction: true});
 const dbLibrary = new PouchDB('library', {auto_compaction: true});
 const dbHistory = new PouchDB('history', {auto_compaction: true});
 
-let audio = document.getElementById('currentTrack');
+// app state
+const audio = document.getElementById('currentTrack');
 
-ipcRenderer.on('newDevice', (event, arg) => {
-    audio.setSinkId(arg).then(function(){}).catch(function(err) {console.error(err);});
-    dbSettings.get('config', function (err, doc) {
-        if (err) {
-            console.error(err);
-        } else {
-            doc.outputDevice = arg;
-            dbSettings.put(doc, function(err, response) {
-                if (err) {
-                    console.error(err);
-                }
-                ipcRenderer.send('settings', doc.outputDevice)
-            });
-        }
-    });
+const status = {
+    nowPlaying: '',
+    duration: '',
+    currentTime: '',
+    remainingTime: '',
+    bitRate: '',
+    seen: true,
+    isActive: false,
+    isPaused: false
+};
+
+const vmMain = new Vue({
+    el: '#container',
+    data: status
 });
 
-
-// load default settings
+// load settings
 dbSettings.info(function (err, info) {
     if (err) {
         console.error(err);
@@ -45,7 +44,7 @@ dbSettings.info(function (err, info) {
     }
     if (info.doc_count == 0) {
         // new setup
-        var config = {
+        let config = {
             "_id": "config",
             "libraryPath": remote.app.getPath('home'),
             "volume": 0.5,
@@ -66,7 +65,8 @@ dbSettings.info(function (err, info) {
             if (err) {
                 console.error(err);
             } else {
-                document.getElementById('vol').value = doc.volume;
+                // load settings into UI
+                // document.getElementById('vol').value = doc.volume;
                 gainNode.gain.value = scaleVolume(doc.volume);
                 audio.setSinkId(doc.outputDevice).then(function(){}).catch(function(err) {console.error(err);});
                 ipcRenderer.send('settings', doc.outputDevice)
@@ -75,8 +75,30 @@ dbSettings.info(function (err, info) {
     }
 });
 
+// received new settings from options window
+ipcRenderer.on('newDevice', (event, arg) => {
+    audio.setSinkId(arg).then(function(){}).catch(function(err) {console.error(err);});
+    dbSettings.get('config', function (err, doc) {
+        if (err) {
+            console.error(err);
+        } else {
+            doc.outputDevice = arg;
+            dbSettings.put(doc, function(err, response) {
+                if (err) {
+                    console.error(err);
+                }
+                ipcRenderer.send('settings', doc.outputDevice)
+            });
+        }
+    });
+});
 
-// directory chooser
+// save settings on exit
+window.onbeforeunload = function(e) {
+    saveVol(document.getElementById('vol').value);
+};
+
+// library directory chooser
 function setLibraryPath() {
     remote.dialog.showOpenDialog({title:'Add Music Library', defaultPath:remote.app.getPath('home'), properties:["openDirectory"]}, function(filePath) {
         if(filePath) {
@@ -100,6 +122,7 @@ function setLibraryPath() {
     });
 }
 
+// scan library for music tracks
 function scanLibrary() {
     console.log("scanning library...");
     dbSettings.get("config", function (err, doc) {
@@ -118,9 +141,10 @@ function scanLibrary() {
     });
 }
 
+// read ID3 tags
 function readMetaData(tracks) {
     console.log("reading metadata...");
-    var pendingTracks = [];
+    let pendingTracks = [];
     async.eachLimit(tracks, 10, function(item, cb) {
         let readableStream = fs.createReadStream(item);
         let parser = mm(readableStream, function (err, metadata) {
@@ -152,6 +176,7 @@ function readMetaData(tracks) {
     })
 }
 
+// add tracks to library db
 function updateLibrary(tracks) {
     console.log("updating library db...");
     dbLibrary.bulkDocs(tracks, function (err, result) {
@@ -162,41 +187,32 @@ function updateLibrary(tracks) {
     });
 }
 
-// slowly restore volume
-//gainNode.gain.linearRampToValueAtTime(VOL, audioCtx.currentTime + 2);
-
-window.onbeforeunload = function(e) {
-    saveVol(document.getElementById('vol').value);
-};
-
-// todo: display vol in dBFS (and set a stop at 1 on the input slider)
-//let dbfs = 20 * Math.log10(gain);
-
-// logarithmic volume
+// logarithmic volume scale
 function scaleVolume(position) {
     if(position <= 10) {
         return 0;
     }
     // input position between 1 and 1000
-    var minp = 1;
-    var maxp = 1000;
+    const minp = 1;
+    const maxp = 1000;
 
     // output should be between 0.001 and 1
-    var minv = Math.log(0.001);
-    var maxv = Math.log(1);
+    const minv = Math.log(0.001);
+    const maxv = Math.log(1);
 
     // calculate adjustment factor
-    var scale = (maxv-minv) / (maxp-minp);
+    const scale = (maxv-minv) / (maxp-minp);
 
     return Math.exp(minv + scale*(position-minp));
 }
 
 function setVol(val) {
     //audio.volume = val;
+    //let dBFS = 20 * Math.log10(gain);
     gainNode.gain.value = scaleVolume(val);
 }
 
-
+// save volume to db
 function saveVol(vol) {
     dbSettings.get('config', function (err, doc) {
         if (err) {
@@ -230,16 +246,10 @@ function playPause() {
     }
 }
 
-let status = {
-    nowPlaying: '',
-    duration: '',
-    currentTime: '',
-    remainingTime: '',
-    bitRate: '',
-    seen: true,
-    isActive: false,
-    isPaused: false
-};
+function mute() {
+    // slowly restore volume
+    //gainNode.gain.linearRampToValueAtTime(VOL, audioCtx.currentTime + 2);
+}
 
 
 audio.onended = function() {
@@ -254,36 +264,31 @@ function prettyTime(s) {
     return minutes + ":" + seconds;
 }
 
+// return path str without the "file://" prefix
 function trimFilePrefix(path) {
-    // returns path str without the "file://" prefix
     if (process.platform == 'darwin') {
         return decodeURIComponent((audio.src).slice(7));
     }
     return decodeURIComponent((audio.src).slice(8));
 }
 
+// calculate bitrate from track length and filesize
 function getBitRate() {
-    var track = trimFilePrefix(audio.src);
+    const track = trimFilePrefix(audio.src);
     fs.stat(track, function(err, stats) {
         if(err) {
             console.log(err);
             return;
         }
         // bytes -> kilobits per second
-        var bytes = stats.size;
-        var bits = bytes * 8;
-        var kbits = bits / 1000;
-        var s = audio.duration;
-        var bitrate = kbits/s;
+        const bytes = stats.size;
+        const bits = bytes * 8;
+        const kbits = bits / 1000;
+        const s = audio.duration;
+        const bitrate = kbits/s;
         status.bitRate = Math.floor(bitrate) + 'kbps'
     });
 }
-
-function remainingTime(elapsed, total) {
-    var s = total - elapsed
-    return "-" + prettyTime(s)
-}
-
 
 audio.onloadedmetadata = function() {
     status.duration = prettyTime(audio.duration);
@@ -292,7 +297,7 @@ audio.onloadedmetadata = function() {
 
 audio.ontimeupdate = function() {
     status.currentTime = prettyTime(audio.currentTime);
-    status.remainingTime = remainingTime(audio.currentTime, audio.duration)
+    status.remainingTime = "-" + prettyTime(audio.currentTime - audio.duration)
 };
 
 audio.onplay = function(){
@@ -330,7 +335,7 @@ function playRandom() {
                 });
                 audio.play();
                 // add track to history db
-                updateHistory({"_id":randomSong,"lastPlayed":new Date().toISOString()})
+                updateHistory({"_id":randomSong,"lastPlayed":new Date().toISOString()});
                 return;
             }
             avoidHistory(result)
@@ -347,71 +352,53 @@ function updateHistory(track) {
 }
 
 
-var appStatus = new Vue({
-    el: '#container',
-    data: status
-});
-
-
-// web audio stuff (we can still play/pause thru the media element, and have its output routed into the processing
-// graph of the audio context!
-
+// web audio stuff
+// note the mixed contexts: we can play/pause thru the media element, and have its output routed into the processing
+// graph of the web audio context
 
 // audio context (container)
-var audioCtx = new window.AudioContext();
+const audioCtx = new window.AudioContext();
 
 // audio input
-var source = audioCtx.createMediaElementSource(audio);
+const source = audioCtx.createMediaElementSource(audio);
 
 // other audio nodes
-var gainNode = audioCtx.createGain();
+const gainNode = audioCtx.createGain();
+const panNode = audioCtx.createStereoPanner();
+const analyser = audioCtx.createAnalyser();
 
-// stereo panner
-var panNode = audioCtx.createStereoPanner();
-
-var analyser = audioCtx.createAnalyser();
+// analyser
 analyser.fftSize = 2048;
-var bufferLength = analyser.frequencyBinCount;
-var dataArray = new Uint8Array(bufferLength);
+let bufferLength = analyser.frequencyBinCount;
+let dataArray = new Uint8Array(bufferLength);
 
-var canvas = document.getElementById("canvas");
-var canvasCtx = canvas.getContext("2d");
+const canvas = document.getElementById("canvas");
+const canvasCtx = canvas.getContext("2d");
 
 canvasCtx.clearRect(0, 0, 600, 600);
 
 function draw() {
     drawVisual = requestAnimationFrame(draw);
-
     analyser.getByteFrequencyData(dataArray);
-
     canvasCtx.clearRect(0, 0, 600, 600);
+    let barWidth = (600 / bufferLength) *1.6;
+    let barHeight;
+    let x = 0;
 
-    var barWidth = (600 / bufferLength) *1.6;
-    var barHeight;
-    var x = 0;
-
-    for(var i = 0; i < bufferLength; i++) {
+    for(let i = 0; i < bufferLength; i++) {
         barHeight = dataArray[i];
-
         canvasCtx.fillStyle = 'rgba(' + 65 + ',' + 255 + ',200,' + barHeight/100 + ')';
         canvasCtx.fillRect(x,200-barHeight/2,barWidth,barHeight);
-
         x += 2;
     }
-
-
 }
 
 draw();
 
 
-// wire them together
+// wire nodes together
+// todo: toggle analysis pre/post effects nodes (ie gain before analysis)
 source.connect(analyser);
 analyser.connect(gainNode);
 gainNode.connect(panNode);
-
-// audio output
-// todo: toggle analysis pre/post effects nodes
-//gainNode.connect(audioCtx.destination);
-//gainNode.connect(analyser);
 panNode.connect(audioCtx.destination);
