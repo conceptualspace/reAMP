@@ -262,6 +262,7 @@ audio.onended = function() {
 
 
 function prettyTime(s) {
+    // assumes s is positive
     let minutes = Math.floor(s / 60);
     let seconds = ("00" + Math.floor(s % 60)).slice(-2);
     return minutes + ":" + seconds;
@@ -300,7 +301,7 @@ audio.onloadedmetadata = function() {
 
 audio.ontimeupdate = function() {
     status.currentTime = prettyTime(audio.currentTime);
-    status.remainingTime = prettyTime((audio.currentTime - audio.duration))
+    status.remainingTime = "-" + prettyTime((audio.duration - audio.currentTime))
 };
 
 audio.onplay = function(){
