@@ -17,10 +17,15 @@ as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 
 	<body>
 		<div id="container">
-			<canvas id="canvas" width="600" height="400">
+			<canvas id="canvas" width="600" height="400" v-show="!playlistVisible">
 				analyser
 			</canvas>
-			<div id="playlist" v-bind:class="{ active: isActive }">
+			<div id="playlist" v-if="playlistVisible">
+				<ol>
+					<li v-for="track in playlist">
+						{{ track.title }}
+					</li>
+				</ol>
 			</div>
 			<div id="status" v-bind:title="nowPlaying">
 				{{ nowPlaying }}
@@ -31,7 +36,7 @@ as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 			</div>
 			<div id="controls">
 				<button onclick="setLibraryPath();" title="Select Library Folder"><i class="fa fa-lg fa-folder-open-o"></i></button>
-				<button onclick="ipcRenderer.send('message', 'showPlaylist')" title="Show Playlist"><i class="fa fa-lg fa-list"></i></button>
+				<button onclick="status.playlistVisible = !status.playlistVisible" title="Show Playlist"><i class="fa fa-lg fa-list"></i></button>
 				<button id ="backBtn" onclick="back();" title="Previous Track"><i class="fa fa-lg fa-step-backward"></i></button>
 				<button id ="playBtn" onclick="playPause();" title="Play/Pause" v-bind:class="{ active: isActive, paused: isPaused }"><i class="fa fa-lg fa-play"></i><strong>||</strong></button>
 				<button id ="shuffle" onclick="playRandom();" title="Play Random"><i class="fa fa-lg fa-random"></i></button>

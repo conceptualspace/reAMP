@@ -16,6 +16,7 @@ const _ = require('underscore');
 const dbSettings = new PouchDB('settings', {auto_compaction: true});
 const dbLibrary = new PouchDB('library', {auto_compaction: true});
 const dbHistory = new PouchDB('history', {auto_compaction: true});
+const dbPlaylists = new PouchDB('playlists', {auto_compaction: true});
 
 // app state
 const audio = document.getElementById('currentTrack');
@@ -28,13 +29,17 @@ const status = {
     bitRate: '',
     seen: true,
     isActive: false,
-    isPaused: false
+    isPaused: false,
+    playlistVisible: false,
+    playlist: ''
 };
+
 
 const vmMain = new Vue({
     el: '#container',
     data: status
 });
+
 
 // load settings
 dbSettings.info(function (err, info) {
@@ -44,7 +49,7 @@ dbSettings.info(function (err, info) {
     }
     if (info.doc_count == 0) {
         // new setup
-        let config = {
+        const config = {
             "_id": "config",
             "libraryPath": remote.app.getPath('home'),
             "volume": 0.5,
@@ -52,12 +57,22 @@ dbSettings.info(function (err, info) {
             "nowPlaying": 0,
             "outputDevice": "default"
         };
+        const queue = {
+            "_id": "queue",
+            "tracks": []
+        };
         dbSettings.put(config, function(err, response) {
             if (err) {
                 console.error(err);
                 return;
             }
-            console.log("new setup! defaults loaded");
+            dbPlaylists.put(queue, function(err, response) {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                console.log("new setup! defaults loaded");
+            });
         });
     } else {
         // restore saved settings
@@ -97,6 +112,19 @@ ipcRenderer.on('newDevice', (event, arg) => {
 window.onbeforeunload = function(e) {
     saveVol(document.getElementById('vol').value);
 };
+
+// load playlist
+// todo ensure settings initialized first
+dbPlaylists.get('queue', function (err, doc) {
+    if (err) {
+        console.error(err);
+    } else {
+        // load into UI
+        // document.getElementById('vol').value = doc.volume;
+        status.playlist = doc.tracks
+        console.log(doc.tracks);
+    }
+});
 
 // library directory chooser
 function setLibraryPath() {
@@ -187,6 +215,22 @@ function updateLibrary(tracks) {
             return console.error(err);
         }
         console.log("database updated!")
+        // lets add the whole library to the queue for giggles
+        //todo: restore this
+        dbPlaylists.get('queue', function (err, doc) {
+            if (err) {
+                console.error(err);
+            } else {
+                doc.tracks = tracks
+                dbPlaylists.put(doc, function (err, response) {
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
+                    console.log("updated playlist!");
+                });
+            }
+        });
     });
 }
 
@@ -301,7 +345,7 @@ audio.onloadedmetadata = function() {
 
 audio.ontimeupdate = function() {
     status.currentTime = prettyTime(audio.currentTime);
-    status.remainingTime = "-" + prettyTime((audio.duration - audio.currentTime))
+    status.remainingTime = "-" + prettyTime(audio.duration - audio.currentTime)
 };
 
 audio.onplay = function(){

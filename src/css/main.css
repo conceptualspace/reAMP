@@ -77,6 +77,11 @@ input:focus, button:focus {
     padding: 5px;
 }
 
+#playlist {
+    flex: 10;
+    padding: 10px;
+}
+
 #status {
     white-space: nowrap;
     overflow: hidden;
@@ -107,4 +112,8 @@ input:focus, button:focus {
 #duration {
     font-family:Courier;
     padding: 0px 10px;
+}
+
+.hidden {
+    display: none;
 }
