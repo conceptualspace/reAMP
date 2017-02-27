@@ -336,6 +336,7 @@ function playRandom() {
                     } else {
                         status.nowPlaying = doc.artist + " - " + doc.title + " (" + doc.album + ")";
                     }
+                    ipcRenderer.send('tooltip', doc.artist + " - " + doc.title)
                 });
                 audio.play();
                 // add track to history db

@@ -20,6 +20,8 @@ as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 			<canvas id="canvas" width="600" height="400">
 				analyser
 			</canvas>
+			<div id="playlist" v-bind:class="{ active: isActive }">
+			</div>
 			<div id="status" v-bind:title="nowPlaying">
 				{{ nowPlaying }}
 			</div>
