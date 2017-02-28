@@ -87,6 +87,17 @@ dbSettings.info(function (err, info) {
                 ipcRenderer.send('settings', doc.outputDevice)
             }
         });
+        // load playlist
+        dbPlaylists.get('queue', function (err, doc) {
+            if (err) {
+                console.error(err);
+            } else {
+                // load into UI
+                // document.getElementById('vol').value = doc.volume;
+                status.playlist = doc.tracks
+                console.log(doc.tracks);
+            }
+        });
     }
 });
 
@@ -112,19 +123,6 @@ ipcRenderer.on('newDevice', (event, arg) => {
 window.onbeforeunload = function(e) {
     saveVol(document.getElementById('vol').value);
 };
-
-// load playlist
-// todo ensure settings initialized first
-dbPlaylists.get('queue', function (err, doc) {
-    if (err) {
-        console.error(err);
-    } else {
-        // load into UI
-        // document.getElementById('vol').value = doc.volume;
-        status.playlist = doc.tracks
-        console.log(doc.tracks);
-    }
-});
 
 // library directory chooser
 function setLibraryPath() {

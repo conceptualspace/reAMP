@@ -16,7 +16,7 @@ let tray;
 function createWindow () {
     // Create the browser window.
     win = new BrowserWindow({
-        width: 460,
+        width: 480,
         height: 500,
         useContentSize: true,
         frame: false,
@@ -61,7 +61,7 @@ function createWindow () {
         parent: win,
         transparent: true,
         resizable: false,
-        width: 460,
+        width: 480,
         height: 500,
         useContentSize: true
     });
@@ -77,7 +77,6 @@ function createWindow () {
 
     // Open DevTools.
     win.webContents.openDevTools();
-    optionsWin.webContents.openDevTools();
 
     // listeners
 
