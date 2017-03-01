@@ -176,7 +176,7 @@ function readMetaData(tracks) {
     let pendingTracks = [];
     async.eachLimit(tracks, 10, function(item, cb) {
         let readableStream = fs.createReadStream(item);
-        let parser = mm(readableStream, function (err, metadata) {
+        mm(readableStream, function (err, metadata) {
             readableStream.close();
             if(err) {
                 cb(null);
