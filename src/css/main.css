@@ -48,6 +48,21 @@ button:hover {
     color: deepskyblue;
 }
 
+ol {
+    list-style-position: inside;
+}
+
+li {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+li:hover {
+    cursor: default;
+    color: deepskyblue;
+}
+
 .active {
     color: deepskyblue;
 }
