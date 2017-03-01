@@ -83,7 +83,6 @@ function createWindow () {
     ipcMain.on('tooltip', (event, arg) => {
         //event.sender.send('settings', arg)
         tray.setToolTip(arg + ' - reAMP');
-        optionsWin.webContents.send('settings', arg);
     });
 
     ipcMain.on('message', (event, arg) => {
