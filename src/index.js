@@ -321,10 +321,11 @@ audio.onended = function() {
 
 
 function prettyTime(s) {
-    // assumes s is positive
-    let minutes = Math.floor(s / 60);
-    let seconds = ("00" + Math.floor(s % 60)).slice(-2);
-    return minutes + ":" + seconds;
+    // assumes duration is positive
+    let min = Math.floor(s/60);
+    let sec = Math.floor(s%60);
+    //let ms = (s*1000)%1000;
+    return ("00" + min).slice(-2) + ":" + ("00" + sec).slice(-2);
 }
 
 // return path str without the "file://" prefix
@@ -358,13 +359,6 @@ audio.onloadedmetadata = function() {
     getBitRate()
 };
 
-audio.ontimeupdate = function() {
-    let newStatus = {
-        currentTime: prettyTime(audio.currentTime),
-        remainingTime: "-" + prettyTime(audio.duration - audio.currentTime)
-    };
-    Object.assign(status, newStatus)
-};
 
 audio.onplay = function(){
     status.isActive = true
@@ -460,6 +454,8 @@ const canvasCtx = canvas.getContext("2d");
 canvasCtx.clearRect(0, 0, 600, 600);
 
 function draw() {
+    status.remainingTime = "-" + prettyTime(audio.duration - audio.currentTime);
+
     drawVisual = requestAnimationFrame(draw);
     analyser.getByteFrequencyData(dataArray);
     canvasCtx.clearRect(0, 0, 600, 600);
