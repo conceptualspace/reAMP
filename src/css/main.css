@@ -93,7 +93,7 @@ input:focus, button:focus {
     padding: 5px;
 }
 
-#playlist {
+#playlistContainer {
     flex: 8;
     padding: 10px;
     overflow-x: hidden;

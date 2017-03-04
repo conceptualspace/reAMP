@@ -10,6 +10,7 @@ const path = require('path');
 const glob = require('glob');
 const async = require('async');
 const mm = require('musicmetadata');
+const Sortable = require('sortablejs');
 const _ = require('underscore');
 
 // setup DB
@@ -19,8 +20,6 @@ const dbHistory = new PouchDB('history', {auto_compaction: true});
 const dbPlaylists = new PouchDB('playlists', {auto_compaction: true});
 
 // app state
-const audio = document.getElementById('currentTrack');
-
 const status = {
     nowPlaying: '',
     duration: '',
@@ -31,15 +30,24 @@ const status = {
     isActive: false,
     isPaused: false,
     playlistVisible: false,
-    playlist: ''
+    playlist: '',
+    queuePosition: 0
 };
 
+// vue app
+Vue.directive('sortable', {
+    inserted: function (el, binding) {
+        new Sortable(el, binding.value || {})
+    }
+});
 
 const vmMain = new Vue({
     el: '#container',
     data: status
 });
 
+// audio media element
+let audio = document.getElementById('currentTrack');
 
 // load settings
 dbSettings.info(function (err, info) {
@@ -174,6 +182,7 @@ function scanLibrary() {
 function readMetaData(tracks) {
     console.log("reading metadata...");
     let pendingTracks = [];
+    // limit of 10 worked well on my system, but worth testing further
     async.eachLimit(tracks, 10, function(item, cb) {
         let readableStream = fs.createReadStream(item);
         mm(readableStream, function (err, metadata) {
@@ -192,7 +201,8 @@ function readMetaData(tracks) {
                 "title": metadata.title || "",
                 "year": metadata.year || "",
                 "track": metadata.track.no || "",
-                "genre": metadata.genre[0] || ""
+                "genre": metadata.genre[0] || "",
+                "order": ""
             });
             cb()
         })
@@ -200,6 +210,14 @@ function readMetaData(tracks) {
         if(err) {
             console.error(err);
         }
+        // sort by path
+        _.sortBy(pendingTracks, "_id");
+
+        // assign a sort order index
+        for(let i in pendingTracks) {
+            pendingTracks[i].order = i
+        }
+
         // done fetching metadata; update library database
         updateLibrary(pendingTracks);
     })
@@ -281,13 +299,11 @@ function setBalance(val) {
 function playPause() {
     if(status.isActive) {
         audio.pause();
-        status.isPaused = true;
-        status.isActive = false;
+        Object.assign(status, {isPaused: true, isActive: false})
     }
     else if(audio.src) {
         audio.play();
-        status.isPaused = false;
-        status.isActive = true;
+        Object.assign(status, {isPaused: false, isActive: true})
     }
 }
 
@@ -342,8 +358,11 @@ audio.onloadedmetadata = function() {
 };
 
 audio.ontimeupdate = function() {
-    status.currentTime = prettyTime(audio.currentTime);
-    status.remainingTime = "-" + prettyTime(audio.duration - audio.currentTime)
+    let newStatus = {
+        currentTime: prettyTime(audio.currentTime),
+        remainingTime: "-" + prettyTime(audio.duration - audio.currentTime)
+    };
+    Object.assign(status, newStatus)
 };
 
 audio.onplay = function(){
@@ -352,6 +371,10 @@ audio.onplay = function(){
 
 function playRandom() {
     dbLibrary.allDocs(function(err, result) {
+        if(err) {
+            console.error(err);
+            return;
+        }
         avoidHistory(result.rows);
     });
 

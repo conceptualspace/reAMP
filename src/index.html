@@ -20,9 +20,9 @@ as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 			<canvas id="canvas" width="600" height="400" v-show="!playlistVisible">
 				analyser
 			</canvas>
-			<div id="playlist" v-if="playlistVisible">
-				<ol>
-					<li v-for="track in playlist">
+			<div id="playlistContainer" v-if="playlistVisible">
+				<ol id="playlist" v-sortable="{ghostClass: 'active'}">
+					<li v-for="track in playlist" :key="track._id">
 						{{ track.artist }} - {{ track.title }}
 					</li>
 				</ol>
