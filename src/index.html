@@ -22,7 +22,7 @@ as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 			</canvas>
 			<div id="playlistContainer" v-if="playlistVisible">
 				<ol id="playlist" v-sortable="{ghostClass: 'active'}">
-					<li v-for="track in playlist" :key="track._id" @dblclick="playNext(track)" :class="[( track._id === currentTrack ) ? 'activeGreen' : '']">
+					<li v-for="track in playlist" :key="track._id" @dblclick="playNext(track)" @contextmenu.prevent="playNext(track)" :class="[( track._id === currentTrack ) ? 'activeGreen' : '']">
 						{{ track.artist }} - {{ track.title }}
 					</li>
 				</ol>
