@@ -416,7 +416,8 @@ function updateHistory(track) {
     });
 }
 
-function playNext() {
+function playNext(t) {
+    console.log(t._id);
     audio.src = '';
     audio.load();
     let i = Math.floor((Math.random() * status.playlist.length));
