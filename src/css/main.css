@@ -68,6 +68,10 @@ li:hover {
     color: deepskyblue;
 }
 
+.activeGreen {
+    color: rgb(65, 255, 200);
+}
+
 .paused {
     animation: pulse 1.2s linear infinite;
 }

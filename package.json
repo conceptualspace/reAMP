@@ -6,9 +6,10 @@
   "license": "MPL-2.0",
   "main": "src/main.js",
   "dependencies": {
-    "glob": "^7.1.1",
     "async": "^2.1.5",
+    "glob": "^7.1.1",
     "musicmetadata": "^2.0.4",
+    "sortablejs": "^1.5.1",
     "underscore": "^1.8.3"
   },
   "devDependencies": {

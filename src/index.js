@@ -22,6 +22,7 @@ const dbPlaylists = new PouchDB('playlists', {auto_compaction: true});
 // app state
 const status = {
     nowPlaying: '',
+    currentTrack: '',
     duration: '',
     currentTime: '',
     remainingTime: '',
@@ -419,6 +420,17 @@ function updateHistory(track) {
             console.error(err);
         }
     });
+}
+
+function playNext() {
+    audio.src = '';
+    audio.load();
+    let i = Math.floor((Math.random() * status.playlist.length));
+    let randomSong = status.playlist[i]._id;
+    status.currentTrack = randomSong;
+    status.nowPlaying = status.playlist[i].artist + " - " + status.playlist[i].title;
+    audio.src = randomSong;
+    audio.play();
 }
 
 
