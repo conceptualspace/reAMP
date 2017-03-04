@@ -454,7 +454,9 @@ const canvasCtx = canvas.getContext("2d");
 canvasCtx.clearRect(0, 0, 600, 600);
 
 function draw() {
-    status.remainingTime = "-" + prettyTime(audio.duration - audio.currentTime);
+    if(audio.duration && audio.currentTime) {
+        status.remainingTime = "-" + prettyTime(audio.duration - audio.currentTime);
+    }
 
     drawVisual = requestAnimationFrame(draw);
     analyser.getByteFrequencyData(dataArray);
