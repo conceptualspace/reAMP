@@ -38,7 +38,23 @@ const status = {
 // vue app
 Vue.directive('sortable', {
     inserted: function (el, binding) {
-        new Sortable(el, binding.value || {})
+        playlistSortable = Sortable.create(el, {
+            group: "queue",
+            // todo: migrate sort store from localStorage to pouchDB
+            store: {
+                get: function (sortable) {
+                    let order = localStorage.getItem(sortable.options.group.name);
+                    return order ? order.split('|') : [];
+                },
+                set: function (sortable) {
+                    let order = sortable.toArray();
+                    localStorage.setItem(sortable.options.group.name, order.join('|'));
+                }
+            },
+            onSort: function (evt) {
+                playlistSortable.save();
+            },
+        })
     }
 });
 
@@ -104,7 +120,7 @@ dbSettings.info(function (err, info) {
                 // load into UI
                 // document.getElementById('vol').value = doc.volume;
                 status.playlist = doc.tracks
-                console.log(doc.tracks);
+                //console.log(doc.tracks);
             }
         });
     }
@@ -295,6 +311,30 @@ function saveVol(vol) {
 
 function setBalance(val) {
     panNode.pan.value = val;
+}
+
+function play(track) {
+    // clear prev
+    audio.src = '';
+    audio.load();
+
+    // get metadata from queue state
+
+    let trackMeta = status.playlist.find(function(playlist) {
+        return playlist._id == track._id
+    });
+
+    // load metadata into UI
+    status.currentTrack = track._id;
+    status.nowPlaying = trackMeta.artist == '' ? path.basename(doc._id) : trackMeta.artist + " - " + trackMeta.title + " (" + trackMeta.album + ")";
+    ipcRenderer.send('tooltip', status.nowPlaying);
+
+    // play track
+    audio.src = track._id;
+    audio.play();
+
+    // update history db
+    //updateHistory({"_id":track._id,"lastPlayed":new Date().toISOString()});
 }
 
 function playPause() {
