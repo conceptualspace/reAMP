@@ -40,6 +40,9 @@ Vue.directive('sortable', {
     inserted: function (el, binding) {
         playlistSortable = Sortable.create(el, {
             group: "queue",
+            ghostClass: 'activeDrag',
+            chosenClass: 'activeDrag',
+            dragClass: 'dragOverlay',
             // todo: migrate sort store from localStorage to pouchDB
             store: {
                 get: function (sortable) {

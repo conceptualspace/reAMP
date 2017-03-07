@@ -61,13 +61,19 @@ li {
 
 li:hover {
     cursor: default;
-    color: deepskyblue;
 }
 
 .active {
     color: deepskyblue;
 }
 
+.activeDrag {
+    color: deepskyblue;
+}
+
+.dragOverlay {
+    opacity: 0.5;
+}
 .activeGreen {
     color: rgb(65, 255, 200);
 }
