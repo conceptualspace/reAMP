@@ -106,7 +106,7 @@ dbSettings.info(function (err, info) {
                 console.error(err);
             } else {
                 // load settings into UI
-                // document.getElementById('vol').value = doc.volume;
+                document.getElementById('vol').value = doc.volume;
                 gainNode.gain.value = scaleVolume(doc.volume);
                 audio.setSinkId(doc.outputDevice).then(function(){}).catch(function(err) {console.error(err);});
                 ipcRenderer.send('settings', doc.outputDevice)
@@ -364,8 +364,8 @@ function prettyTime(s) {
     // assumes duration is positive
     let min = Math.floor(s/60);
     let sec = Math.floor(s%60);
-    //let ms = (s*1000)%1000;
-    return ("00" + min).slice(-2) + ":" + ("00" + sec).slice(-2);
+    let ms = Math.floor((s*1000)%1000);
+    return ("00" + min).slice(-2) + ":" + ("00" + sec).slice(-2) + ":" + (ms + "000").slice(0,3);
 }
 
 // return path str without the "file://" prefix
