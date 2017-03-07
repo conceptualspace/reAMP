@@ -329,7 +329,7 @@ function play(track) {
 
     // load metadata into UI
     status.currentTrack = track._id;
-    status.nowPlaying = trackMeta.artist == '' ? path.basename(doc._id) : trackMeta.artist + " - " + trackMeta.title + " (" + trackMeta.album + ")";
+    status.nowPlaying = trackMeta.artist == '' ? path.basename(trackMeta._id) : trackMeta.artist + " - " + trackMeta.title + " (" + trackMeta.album + ")";
     ipcRenderer.send('tooltip', status.nowPlaying);
 
     // play track
@@ -338,6 +338,26 @@ function play(track) {
 
     // update history db
     //updateHistory({"_id":track._id,"lastPlayed":new Date().toISOString()});
+}
+
+function next() {
+    // clear prev
+    audio.src = '';
+    audio.load();
+
+    let trackIndex = status.playlist.findIndex(function(playlist) {
+        return playlist._id == status.currentTrack
+    });
+
+    let nextTrack = status.playlist[trackIndex+1];
+
+    status.currentTrack = nextTrack._id;
+    status.nowPlaying = nextTrack.artist == '' ? path.basename(nextTrack._id) : nextTrack.artist + " - " + nextTrack.title + " (" + nextTrack.album + ")";
+    ipcRenderer.send('tooltip', status.nowPlaying);
+
+    audio.src = nextTrack._id;
+    audio.play();
+
 }
 
 function playPause() {

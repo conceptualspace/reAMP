@@ -38,7 +38,8 @@ as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 				<button onclick="setLibraryPath();" title="Select Library Folder"><i class="fa fa-lg fa-folder-open-o"></i></button>
 				<button onclick="status.playlistVisible = !status.playlistVisible" title="Show Playlist"><i class="fa fa-lg fa-list"></i></button>
 				<button id ="backBtn" onclick="back();" title="Previous Track"><i class="fa fa-lg fa-step-backward"></i></button>
-				<button id ="playBtn" onclick="playPause();" title="Play/Pause" :class="{ active: isActive, paused: isPaused }"><i class="fa fa-lg fa-play"></i><strong>||</strong></button>
+				<button id ="playBtn" onclick="playPause();" title="Play/Pause" :class="{ active: isActive, paused: isPaused }"><i class="fa fa-lg fa-play"></i></button>
+				<button id ="nextBtn" onclick="next();" title="Next Track"><i class="fa fa-lg fa-step-forward"></i></button>
 				<button id ="shuffle" onclick="playNext();" title="Play Random"><i class="fa fa-lg fa-random"></i></button>
 				<button id ="muteBtn" onclick="mute();" title="Mute"><i class="fa fa-lg fa-volume-up"></i></button>
 				<input type="range" min="0" max="1000" id="vol" step="1" oninput="setVol(value)" title="Volume">
