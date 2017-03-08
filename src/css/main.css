@@ -119,6 +119,11 @@ input:focus, button:focus {
     max-height: 20px;
 }
 
+#albumart {
+    flex: 8;
+    background-size: cover;
+}
+
 #controls {
     padding: 10px;
     display: flex;

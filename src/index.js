@@ -336,9 +336,41 @@ function play(track) {
     audio.src = track._id;
     audio.play();
 
+    document.getElementById("albumart").style.backgroundImage = 'url("' + getArt(track._id) + '")';
+
     // update history db
     //updateHistory({"_id":track._id,"lastPlayed":new Date().toISOString()});
 }
+
+
+function getArt(dir) {
+    const supportedFiles = [
+        'albumart.png',
+        'album.png',
+        'albumart.jpg',
+        'albumart.jpeg',
+        'album.jpg',
+        'album.jpeg',
+        'cover.png',
+        'cover.jpg',
+        'cover.jpeg'
+    ];
+    let art = '';
+    let rootDir = path.dirname(dir);
+    for (let i=0; i < supportedFiles.length; i++) {
+        try {
+            if (fs.statSync(path.join(rootDir, supportedFiles[i])).isFile()) {
+                art = path.join(rootDir, supportedFiles[i]);
+                break;
+            }
+        }
+        catch (e) {
+        }
+    }
+    console.log(art);
+    return art;
+}
+
 
 function next() {
     // clear prev
