@@ -9,6 +9,7 @@ html, body {
     color: lightgray;
 }
 
+
 /* overrides */
 ::-webkit-scrollbar {
     -webkit-appearance: none;
@@ -22,6 +23,10 @@ html, body {
 a, button, input[disabled], label {
     cursor: default !important;
     -webkit-user-select: none !important;
+}
+
+input:focus, button:focus {
+    outline:none;
 }
 
 input[type=range] {
@@ -56,12 +61,6 @@ ol {
 ul {
 }
 
-#foldersContainer {
-    flex: 8;
-    overflow-x: hidden;
-    overflow-y: scroll;
-}
-
 li {
     overflow: hidden;
     white-space: nowrap;
@@ -72,48 +71,59 @@ li:hover {
     cursor: default;
 }
 
-.active {
-    color: deepskyblue;
-}
 
-.activeDrag {
-    color: deepskyblue;
-}
-
-.dragOverlay {
-    opacity: 0.5;
-}
-.activeGreen {
-    color: rgb(65, 255, 200);
-}
-
-.paused {
-    animation: pulse 1.2s linear infinite;
-}
-
-@keyframes pulse {
-    50% { opacity: 0.3; }
-}
-
-input:focus, button:focus {
-    outline:none;
-}
-
-/* stylez */
+/* containers */
 #container {
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
-#canvas {
+#header {
+    -webkit-app-region: drag;
+    flex: 0 0 auto;
+    min-height: 20px;
+}
+
+#footer {
+    flex: 0 0 auto;
+}
+
+#content {
+    flex: 1 1 auto;
+    display: flex;
+}
+
+#leftPane {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+#rightPane {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+#foldersContainer {
     flex: 8;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    font-size: small;
+}
+
+#visualizer {
+    flex: 1;
+}
+
+#canvas {
     -webkit-app-region: drag;
     padding: 5px;
 }
 
 #playlistContainer {
-    flex: 8;
+    flex: 1;
     padding: 10px;
     overflow-x: hidden;
     overflow-y: scroll;
@@ -124,13 +134,14 @@ input:focus, button:focus {
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 10px;
-    flex: 1;
+    flex: auto;
     max-height: 20px;
 }
 
 #albumart {
-    flex: 8;
-    background-size: cover;
+    flex: 1;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
 #controls {
@@ -138,7 +149,7 @@ input:focus, button:focus {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex: 1;
+    flex: auto;
     max-height: 40px;
 }
 
@@ -161,6 +172,32 @@ input:focus, button:focus {
     max-height: 20px;
 }
 
+
+/* states */
 .hidden {
     display: none;
+}
+
+.active {
+    color: deepskyblue;
+}
+
+.activeGreen {
+    color: rgb(65, 255, 200);
+}
+
+.activeDrag {
+    color: deepskyblue;
+}
+
+.dragOverlay {
+    opacity: 0.5;
+}
+
+.paused {
+    animation: pulse 1.2s linear infinite;
+}
+
+@keyframes pulse {
+    50% { opacity: 0.3; }
 }
