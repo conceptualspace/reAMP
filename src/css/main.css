@@ -53,6 +53,15 @@ ol {
     padding: 0px;
 }
 
+ul {
+}
+
+#foldersContainer {
+    flex: 8;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
 li {
     overflow: hidden;
     white-space: nowrap;

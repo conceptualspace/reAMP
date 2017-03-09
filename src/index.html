@@ -18,6 +18,15 @@ as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 	<body>
 		<div id="container">
 
+
+			<div id="foldersContainer">
+				<ul id="demo">
+					<item
+							class="item"
+							:model="libraryFolders">
+					</item>
+				</ul>
+			</div>
 			<div id="playlistContainer" v-if="playlistVisible">
 				<ol id="playlist" v-sortable="{}">
 					<li v-for="track in playlist" :data-id="track._id" :key="track._id" @dblclick="play(track)" @contextmenu.prevent="playNext(track)" :class="[( track._id === currentTrack ) ? 'activeGreen' : '']">
@@ -57,6 +66,17 @@ as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 	</body>
 
 	<script src="lib/vue.min.js"></script>
+	<script type="text/x-template" id="item-template">
+		<li>
+			<div :class="{bold: isFolder}" @click="toggle" @dblclick="play">
+				<i v-if="isFolder" class="material-icons">{{open ? 'folder_open' : 'folder'}}</i>
+				{{model.name}}
+			</div>
+			<ul v-show="open" v-if="isFolder">
+				<item class="item" v-for="model in model.children" :model="model"></item>
+			</ul>
+		</li>
+	</script>
 	<script src="lib/pouchdb-6.1.2.min.js"></script>
 	<script src="lib/pouchdb.upsert.min.js"></script>
 	<script src="index.js"></script>

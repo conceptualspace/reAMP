@@ -20,6 +20,9 @@ const dbHistory = new PouchDB('history', {auto_compaction: true});
 const dbPlaylists = new PouchDB('playlists', {auto_compaction: true});
 
 // app state
+
+const extensions = ['.mp3', '.aiff', '.wav', '.mp4', '.aac', '.m4a', '.ogg', '.flac'];
+
 const status = {
     nowPlaying: '',
     currentTrack: '',
@@ -32,7 +35,8 @@ const status = {
     isPaused: false,
     playlistVisible: false,
     playlist: '',
-    queuePosition: 0
+    queuePosition: 0,
+    libraryFolders: {name: "Library Folders", children: []}
 };
 
 // vue app
@@ -64,6 +68,37 @@ Vue.directive('sortable', {
 const vmMain = new Vue({
     el: '#container',
     data: status
+});
+
+
+Vue.component('item', {
+    template: '#item-template',
+    props: {
+        model: Object
+    },
+    data: function () {
+        return {
+            open: false
+        }
+    },
+    computed: {
+        isFolder: function () {
+            return this.model.children &&
+                this.model.children.length
+        }
+    },
+    methods: {
+        toggle: function () {
+            if (this.isFolder) {
+                this.open = !this.open
+            }
+        },
+        play: function () {
+            if (!this.isFolder) {
+                //
+            }
+        }
+    }
 });
 
 // audio media element
@@ -180,6 +215,7 @@ function setLibraryPath() {
 }
 
 // scan library for music tracks
+// todo: add btn to UI
 function scanLibrary() {
     console.log("scanning library...");
     dbSettings.get("config", function (err, doc) {
@@ -197,6 +233,53 @@ function scanLibrary() {
         });
     });
 }
+
+function dirToJSON (dir, cb) {
+    var results = [];
+
+    fs.readdir(dir, function(err, list) {
+        if (err)
+            return cb(err);
+
+        var pending = list.length;
+
+        if (!pending)
+            return cb(null, {name: path.basename(dir), type: 'folder', children: results});
+
+        list.forEach(function(file) {
+            file = path.resolve(dir, file);
+            fs.stat(file, function(err, stat) {
+                if (stat && stat.isDirectory()) {
+                    dirToJSON(file, function(err, res) {
+                        results.push({
+                            name: path.basename(file),
+                            children: res
+                        });
+                        if (!--pending)
+                            cb(null, results);
+                    });
+                }
+                else {
+                    if (extensions.indexOf(path.extname(file).toLowerCase()) !== -1) {
+                        results.push({
+                            name: path.basename(file)
+                        });
+                    }
+                    if (!--pending)
+                        cb(null, results);
+                }
+            });
+        });
+    });
+};
+
+// todo get library path from settings
+dirToJSON('/Users/tyler/music', function(err, res){
+    if(err)
+        console.error(err);
+
+    status.libraryFolders.children = res;
+});
 
 // read ID3 tags
 function readMetaData(tracks) {
