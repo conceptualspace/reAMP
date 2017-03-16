@@ -36,6 +36,7 @@ const status = {
     playlistVisible: false,
     playlist: '',
     queuePosition: 0,
+    libraryPath: '',
     libraryFolders: {name: "Library Folders", children: []}
 };
 
@@ -145,9 +146,18 @@ dbSettings.info(function (err, info) {
             } else {
                 // load settings into UI
                 document.getElementById('vol').value = doc.volume;
+                status.libraryPath = doc.libraryPath;
                 gainNode.gain.value = scaleVolume(doc.volume);
                 audio.setSinkId(doc.outputDevice).then(function(){}).catch(function(err) {console.error(err);});
-                ipcRenderer.send('settings', doc.outputDevice)
+                ipcRenderer.send('settings', doc.outputDevice);
+                // populate library
+                // todo support multiple root directories
+                dirToJSON(status.libraryPath[0], function(err, res){
+                    if(err)
+                        console.error(err);
+
+                    status.libraryFolders.children = res;
+                });
             }
         });
         // load playlist
@@ -273,13 +283,6 @@ function dirToJSON (dir, cb) {
     });
 };
 
-// todo get library path from settings
-dirToJSON('/Users/tyler/music', function(err, res){
-    if(err)
-        console.error(err);
-
-    status.libraryFolders.children = res;
-});
 
 // read ID3 tags
 function readMetaData(tracks) {
