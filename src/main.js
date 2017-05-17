@@ -4,6 +4,8 @@
  as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
  */
 
+process.env.NODE_ENV = 'production';
+
 const {app, BrowserWindow, ipcMain, Menu, Tray} = require('electron');
 const path = require('path');
 const url = require('url');
