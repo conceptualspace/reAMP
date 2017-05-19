@@ -111,7 +111,7 @@ dbSettings.info(function (err, info) {
         console.error(err);
         return;
     }
-    if (info.doc_count == 0) {
+    if (info.doc_count === 0) {
         // new setup
         const config = {
             "_id": "config",
@@ -245,13 +245,13 @@ function scanLibrary() {
 }
 
 function dirToJSON (dir, cb) {
-    var results = [];
+    let results = [];
 
     fs.readdir(dir, function(err, list) {
         if (err)
             return cb(err);
 
-        var pending = list.length;
+        let pending = list.length;
 
         if (!pending)
             return cb(null, {name: path.basename(dir), type: 'folder', children: results});
@@ -281,7 +281,7 @@ function dirToJSON (dir, cb) {
             });
         });
     });
-};
+}
 
 
 // read ID3 tags
@@ -336,14 +336,14 @@ function updateLibrary(tracks) {
         if (err) {
             return console.error(err);
         }
-        console.log("database updated!")
+        console.log("database updated!");
         // lets add the whole library to the queue for giggles
         //todo: restore this
         dbPlaylists.get('queue', function (err, doc) {
             if (err) {
                 console.error(err);
             } else {
-                doc.tracks = tracks
+                doc.tracks = tracks;
                 dbPlaylists.put(doc, function (err, response) {
                     if (err) {
                         console.error(err);
@@ -410,12 +410,12 @@ function play(track) {
     // get metadata from queue state
 
     let trackMeta = status.playlist.find(function(playlist) {
-        return playlist._id == track._id
+        return playlist._id === track._id
     });
 
     // load metadata into UI
     status.currentTrack = track._id;
-    status.nowPlaying = trackMeta.artist == '' ? path.basename(trackMeta._id) : trackMeta.artist + " - " + trackMeta.title + " (" + trackMeta.album + ")";
+    status.nowPlaying = trackMeta.artist === '' ? path.basename(trackMeta._id) : trackMeta.artist + " - " + trackMeta.title + " (" + trackMeta.album + ")";
     ipcRenderer.send('tooltip', status.nowPlaying);
 
     // play track
@@ -464,13 +464,13 @@ function next() {
     audio.load();
 
     let trackIndex = status.playlist.findIndex(function(playlist) {
-        return playlist._id == status.currentTrack
+        return playlist._id === status.currentTrack
     });
 
     let nextTrack = status.playlist[trackIndex+1];
 
     status.currentTrack = nextTrack._id;
-    status.nowPlaying = nextTrack.artist == '' ? path.basename(nextTrack._id) : nextTrack.artist + " - " + nextTrack.title + " (" + nextTrack.album + ")";
+    status.nowPlaying = nextTrack.artist === '' ? path.basename(nextTrack._id) : nextTrack.artist + " - " + nextTrack.title + " (" + nextTrack.album + ")";
     ipcRenderer.send('tooltip', status.nowPlaying);
 
     audio.src = nextTrack._id;
@@ -511,7 +511,7 @@ function prettyTime(s) {
 
 // return path str without the "file://" prefix
 function trimFilePrefix(path) {
-    if (process.platform == 'darwin') {
+    if (process.platform === 'darwin') {
         return decodeURIComponent((audio.src).slice(7));
     }
     return decodeURIComponent((audio.src).slice(8));
@@ -557,7 +557,7 @@ function playRandom() {
     function avoidHistory(result) {
         // avoid tracks in history
         // todo: make toggleable; reset once history == db
-        if(result.length == 0) {
+        if(result.length === 0) {
             return;
         }
         let i = Math.floor((Math.random() * result.length));
@@ -572,7 +572,7 @@ function playRandom() {
                         console.error(err);
                         return;
                     }
-                    if (doc.artist == '') {
+                    if (doc.artist === '') {
                         status.nowPlaying = path.basename(doc._id)
                     } else {
                         status.nowPlaying = doc.artist + " - " + doc.title + " (" + doc.album + ")";
