@@ -8,7 +8,7 @@
   "dependencies": {
     "async": "^2.1.5",
     "glob": "^7.1.1",
-    "musicmetadata": "^2.0.4",
+    "musicmetadata": "^2.0.5",
     "sortablejs": "^1.5.1",
     "underscore": "^1.8.3"
   },
