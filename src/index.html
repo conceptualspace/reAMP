@@ -29,6 +29,7 @@ as found in the LICENSE file or at: http://mozilla.org/MPL/2.0
 					<div id="playlistContainer" v-if="playlistVisible">
 						<h4>Play Queue</h4>
 						<ol id="playlist" v-sortable="{}">
+							<!-- todo: fix @contextmenu -- used for doubleclick -->
 							<li v-for="track in playlist" :data-id="track._id" :key="track._id" @dblclick="play(track)" @contextmenu.prevent="playNext(track)" :class="[( track._id === currentTrack ) ? 'activeGreen' : '']">
 								{{ track.artist }} - {{ track.title }}
 							</li>

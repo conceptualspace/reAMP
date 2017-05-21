@@ -54,10 +54,20 @@ Vue.directive('sortable', {
             store: {
                 get: function (sortable) {
                     let order = localStorage.getItem(sortable.options.group.name);
+
+                    status.playlist.sort(function(a, b){
+                        return order.indexOf(a._id) - order.indexOf(b._id)
+                    });
+
                     return order ? order.split('|') : [];
                 },
                 set: function (sortable) {
                     let order = sortable.toArray();
+
+                    status.playlist.sort(function(a, b){
+                        return order.indexOf(a._id) - order.indexOf(b._id)
+                    });
+
                     localStorage.setItem(sortable.options.group.name, order.join('|'));
                 }
             },
