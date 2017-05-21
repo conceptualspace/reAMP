@@ -48,6 +48,8 @@ Vue.directive('sortable', {
             ghostClass: 'activeDrag',
             chosenClass: 'activeDrag',
             dragClass: 'dragOverlay',
+            scrollSensitivity: 20, // px, how near the mouse must be to an edge to start scrolling.
+            scrollSpeed: 5, // px
             // todo: migrate sort store from localStorage to pouchDB
             store: {
                 get: function (sortable) {
